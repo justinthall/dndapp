@@ -1,0 +1,4 @@
+import json
+import os
+
+os_project_path = os.path.dirname(os.path.abspath(__file__))
