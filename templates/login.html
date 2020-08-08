@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST">
+{{form.csrf_token}}
+{{form.nickname.label}}
+{{form.nickname(size=30)}}
+<input type="submit" value="Submit">
+</form>
+{% endblock %}

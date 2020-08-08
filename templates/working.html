@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+
+{% block content %}
+<form method="POST">
+    {{form.csrf_token}}
+    {{form.command.label}}
+    {{form.command(size=30)}}
+    <input type="submit" value="Submit">
+</form>
+<p>'This is a string'</p>
+{% endblock %}
