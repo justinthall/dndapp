@@ -1,12 +1,13 @@
-from flask import Flask,render_template,request,redirect,session, make_response,flash
+from flask import *
+from datetime import timedelta
 from forms import CommandForm,LoginForm, NewCharacter
-import pymongo
 from config import SECRET_KEY
 from character import process_character
 app=Flask(__name__)
 app.config['SECRET_KEY']= SECRET_KEY
-myclient= pymongo.MongoClient('mongodb://localhost:27017/')
+app.permanent_session_lifetime= timedelta(weeks=12)
 
+test='test'
 @app.route('/',methods=['GET','POST'])
 def working():
     form=CommandForm()
@@ -31,6 +32,14 @@ def characters():
         result =process_character(request.files['pdf'])
         if type(result)== str:
             flash(result)
+        elif type(result)== dict:
+            try:
+                session['characters'].update({result['charactername']:result})
+            except:
+                session['characters']={result['charactername']:result}
+            session.permanent= True
+            print(session)
+            pass
     return render_template('characters.html',form=form)
 
 

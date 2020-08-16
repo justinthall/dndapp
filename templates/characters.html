@@ -12,6 +12,11 @@
     </ul>
   {% endif %}
 {% endwith %}
+<ul>
+{% for character in session['characters'] %}
+    <li>{{character}}</li>
+{% endfor %}
+</ul>
 <h1><u>Upload new character</u></h1>
 <p> upload a pdf of <a href="https://media.wizards.com/2016/dnd/downloads/5E_CharacterSheet_Fillable.pdf" title="Straight from the coast" target="_blank">This character sheet</a></p>
 <form method="POST" enctype="multipart/form-data">

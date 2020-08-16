@@ -54,9 +54,3 @@ b=battle()
 b.add_initiatee(25,'jason')
 b.add_initiatee(28,'Jason')
 print(b.battleid)
-
-
-
-
-
-
