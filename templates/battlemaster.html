@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Battles{% endblock %}
+
+
+{% block content %}
+<h1 id="create">Create a new battle </h1>
+<form method="POST">
+    {{form.csrf_token}}
+    {{form.battle.label}}
+    {{form.battle(size=30)}}
+    {{form.password.label}}
+    {{form.password(size=25)}}
+    <input type="submit" value="Submit">
+</form>
+{% endblock %}

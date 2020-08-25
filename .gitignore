@@ -3,3 +3,5 @@
 .idea/
 config.py
 __pycache__/
+.project
+.pydevproject
