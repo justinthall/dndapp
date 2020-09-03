@@ -13,4 +13,10 @@
     {{form.password(size=25)}}
     <input type="submit" value="Submit">
 </form>
+<ol>
+{% for battle in battlelist %}
+<li><a href= "/battles/{{ battle }}">{{battle}} </a> </li>
+{% endfor %}
+
+</ol>
 {% endblock %}

@@ -3,6 +3,16 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <title>{{ battle }}</title>
+<style>
+.listplayers {
+margin-left: 40%;
+}
+.hud{
+border: 2px outset black;
+width: 40%;
+float: left;
+}
+</style>
 </head>
 <body>
 <script type="text/javascript">
@@ -13,29 +23,40 @@ $(document).ready(function() {
 	socket.on('connect', function(){
 		socket.emit('join',
 		{nickname: "{{ nickname }}",
-	  	room: "{{ room }}"})
+	  	room: "{{ room }}",
+	  	battle: "{{ battle }}"});	
 	});
+
+		
 	
 	socket.on('message', function(msg) {
 		$("#messages").append('<li>'+msg+'</li>');
 		console.log('Received message');
 	});
-
+	
 	socket.on('joinRoomAnnouncement',function(data){
-		console.log(data)
+		$("#messages").append('<li>'+data+" has joined the battle!"+'</li>');
+		$("#players").append('<li>'+ data +"</li>");
 	})
 	
 	
 	$('#sendbutton').on('click', function() {
-		socket.send($('#myMessage').val());
+		socket.send({msg: $('#myMessage').val(), room: "{{ room }}"});
 		$('#myMessage').val('');
 	});
 
 });
 </script>
+<div style="width: 100%">
+<div class="hud">
 <ul id="messages"></ul>
 <input type="text" id="myMessage">
 <button id="sendbutton">Send</button>
+</div>
+<div class="listplayers">
+<ul id="players"></ul>
+</div>
+</div>
 </body>
 
 

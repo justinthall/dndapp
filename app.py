@@ -2,14 +2,18 @@ from flask import *
 from datetime import timedelta
 from forms import CommandForm, LoginForm, NewCharacter, newBattle
 from config import SECRET_KEY
-from flask_socketio import SocketIO, send, join_room, emit
+from flask_socketio import SocketIO, send, join_room, emit, rooms
 from character import process_character
+import commander
+from secrets import token_hex
+from time import sleep
+from datetime import datetime
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.permanent_session_lifetime = timedelta(weeks=12)
 socketio = SocketIO(app)
 
-test = 'test'
+battlelist = []
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -44,8 +48,6 @@ def characters():
             except:
                 session['characters'] = {result['charactername']: result}
             session.permanent = True
-            print(session)
-            pass
     return render_template('characters.html', form=form)
 
 
@@ -53,31 +55,66 @@ def characters():
 def battleList():
     form = newBattle()
     if form.validate_on_submit():
-        return redirect('/battles/{}'.format(request.form['battle']))
-    return render_template('battlemaster.html', form=form)
+        return redirect('/battles/{}'.format(request.form['battle'] + '_' + token_hex(4)))
+    return render_template('battlemaster.html', form=form, battlelist=battlelist)
 
 
 @app.route('/battles/<battle>', methods=['GET', 'POST'])
 def battle(battle):
-    battlename = battle
-    return render_template('battle.html', battle=battlename, nickname=session['nickname'], room="fred")
+    battlename = battle.split("_")[0]
+    battleid = battle
+    room = battle
+    try:
+        return render_template('battle.html', battle=battlename, battleid=battleid, nickname=session['nickname'], room=room)
+    except(KeyError):
+        flash("You must set a nickname before continuing!", 'error')
+        return redirect('/login')
+
+
+@app.route('/test')
+def testtest():
+    test()
+    return render_template('base.html')
 
 
 @socketio.on('message')
 def handleMessage(msg):
-    emit("message", msg)
+    headers = {}
+    try:
+        headers.update({'characters': session['characters']})
+    except:
+        headers = {'characters': "null"}
+    headers.update({'datetime': str(datetime.utcnow())})
+    headers.update({'nickname': session['nickname']})
+    if msg['msg'][0] == "/":
+        result = commander.parseCommand(msg['msg'], msg['room'], headers)
+        emit("message", result, room=msg['room'])
+    else:
+        emit("message", msg['msg'], room=msg['room'])
 
 
 @socketio.on('connect')
 def connect():
-    print('here')
+    pass
+
+
+@socketio.on('disconnect')
+def disc():
+    pass
 
 
 @socketio.on('join')
 def on_join(data):
-    print(data['nickname'], data['room'])
+    name = data['nickname']
     join_room(data['room'])
-    emit('joinRoomAnnouncement', data)
+    emit('joinRoomAnnouncement', name, room=data['room'])
+    if ['battle'] not in battlelist:
+        battlelist.append(data['battle'])
+
+
+@socketio.on('leave')
+def on_leave():
+    print('yes!!!!!!!!!!!!!!!!!!!!!')
 
 
 if __name__ == '__main__':
