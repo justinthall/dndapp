@@ -33,7 +33,7 @@ def login():
         print(session)
         return redirect('/')
     return render_template('login.html', form=form)
-
+    
 
 @app.route('/characters', methods=['GET', 'POST'])
 def characters():
